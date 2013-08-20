@@ -1,8 +1,9 @@
 # @UnresolvedImport
 from google.appengine.ext import ndb
 import cgi # @UnresolvedImport
+import json # @UnresolvedImport
+#:w
 import urllib # @UnresolvedImport
-import json  # @UnresolvedImport
 import webapp2
 
 
@@ -15,22 +16,22 @@ class WeatherEntry(ndb.Model):
 
   @classmethod
   def queryZip(cls, zip):
-    return cls.query(cls.zipcode==zip).order(-cls.dateTime)
+    return cls.query( cls.zipcode==zip).order(-cls.dateTime)
 
 
 class QueryWeather(webapp2.RequestHandler):
-  def get(self):
-     zipcode = self.request.get('zipcode')
-     weaths = WeatherEntry.queryZip(zipcode).fetch(20)
-     
-     self.response.headers['Content-Type'] = 'application/json'  
-     for weath in weaths: 
-        obj = {
+   def get(self):
+      zipcode = self.request.get('zipcode')
+      weaths = WeatherEntry.queryZip(zipcode).fetch(20)
+      self.response.out.write(len(weaths))
+      self.response.headers['Content-Type'] = 'application/json'  
+      for weath in weaths: 
+         obj = {
            'zipcode': weath.zipcode, 
            'date': weath.date,
            'temperature' : weath.temp
-        } 
-        self.response.out.write(json.dumps(obj))
+         } 
+         self.response.out.write(json.dumps(obj))
      
 
 class InsertWeather(webapp2.RequestHandler):  # @IndentOk
@@ -40,10 +41,13 @@ class InsertWeather(webapp2.RequestHandler):  # @IndentOk
     zip = self.request.get('zipcode')
     temp = self.request.get('temp')
     date = self.request.get('date')
-    weath = WeatherEntry(zipcode=zip, date=date, temp=temp )
+    weath = WeatherEntry(parent=ndb.Key("weather", "yea"))
+    weath.zipcode=zip
+    weath.date=date
+    weath.temp=temp
     weath.put()
 
-app = webapp2.WSGIApplication([
+application = webapp2.WSGIApplication([
   ('/query', QueryWeather),
   ('/modify', InsertWeather),
-])
+], debug=True)
