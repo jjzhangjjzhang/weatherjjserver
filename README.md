@@ -11,4 +11,4 @@ url2 is used to mofidy the weather information in NDB.
 
 url1: http://dearbabymaimai.appspot.com/query?zipcode=53705 \
 
-url2: http://dearbabymaimai.appspot.com/query?zipcode=53705&temp=90&date=08212013
+url2: http://dearbabymaimai.appspot.com/modify?zipcode=53705&temp=90&date=08212013
